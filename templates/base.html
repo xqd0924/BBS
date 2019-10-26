@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <link rel="stylesheet" href="/static/css/{{ blog.theme }}">
+    <title>个人站点</title>
+    <style>
+        #header_style {
+            font-size: 17pt;
+            color:white;
+        }
+    </style>
+
+</head>
+<body>
+<div class="head">
+    <div id="header_style">
+        {{ blog.site_name }}
+    </div>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">我的标签</div>
+                <div class="panel-body">
+                    {% for tag in ret_tag %}
+                        <p>
+                            <a href="/{{ user.username }}/tag/{{ tag.2 }}">{{ tag.0 }}</a>
+                            ({{ tag.1 }})
+                        </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">随笔分类</h3>
+                </div>
+                <div class="panel-body">
+                    {% for category in ret_category %}
+                        <p>
+                            <a href="/{{ user.username }}/category/{{ category.2 }}">{{ category.0 }}</a>
+                            ({{ category.1 }})
+                        </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">随笔档案</h3>
+                </div>
+                <div class="panel-body">
+                    {% for month in ret_month %}
+                        <p>
+                            <a href="/{{ user.username }}/archive/{{ month.0|date:'Y-m' }}">{{ month.0|date:'Y年m月' }}</a>
+                            ({{ month.1 }})
+                        </p>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

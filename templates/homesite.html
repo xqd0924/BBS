@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+    {% for article in article_list %}
+                <div>
+                    <h4><a href="">{{ article.title }}</a></h4>
+                    {{ article.desc }}
+                </div>
+                <div class="clearfix">
+                    <div style="margin-top:15px" class="pull-right">
+                        <span>posted @</span>
+                        <span>{{ article.create_time|date:'Y-m-d H:i' }}</span>
+                        <span><a href="">{{ article.blog.userinfo.username }}</a></span>
+                        <span class="glyphicon glyphicon-comment">评论({{ article.commit_num }})</span>
+                        <span class="glyphicon glyphicon-thumbs-up">点赞({{ article.up_num }})</span>
+                    </div>
+                </div>
+
+
+            {% endfor %}
+{% endblock %}

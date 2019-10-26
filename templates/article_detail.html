@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block content %}
+    <style>
+        #div_digg {
+            float: right;
+            margin-bottom: 10px;
+            margin-right: 30px;
+            font-size: 12px;
+            width: 125px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .diggit {
+            float: left;
+            width: 46px;
+            height: 52px;
+            background: url(/static/img/upup.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .buryit {
+            float: right;
+            margin-left: 20px;
+            width: 46px;
+            height: 52px;
+            background: url(/static/img/downdown.gif) no-repeat;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 2px;
+            padding-top: 5px;
+        }
+
+        .clear {
+            clear: both;
+        }
+
+        .diggword {
+            margin-top: 5px;
+            margin-left: 0;
+            font-size: 12px;
+            color: gray;
+        }
+
+        input.author {
+            background-image: url(/static/img/icon_form.gif);
+            background-repeat: no-repeat;
+            border: 1px solid #ccc;
+            padding: 4px 4px 4px 30px;
+            width: 300px;
+            font-size: 13px;
+        }
+    </style>
+    <div>
+        <div class="text-center">
+            <h4><a href="">{{ article.title }}</a></h4>
+        </div>
+        {{ article.content|safe }}
+        <div class="clearfix">
+            <div id="div_digg">
+                <div class="diggit digg">
+                    <span class="diggnum" id="digg_count">{{ article.up_num }}</span>
+                </div>
+                <div class="buryit digg">
+                    <span class="burynum" id="bury_count">{{ article.down_num }}</span>
+                </div>
+                <div class="clear"></div>
+                <div class="diggword" id="digg_tips" style="color: red;"></div>
+
+            </div>
+        </div>
+        <div>
+            <ul class="list-group append">
+                {% for commit in commit_list %}
+                    <li class="list-group-item">
+                        <div>
+                            <span>#{{ forloop.counter }}楼</span>
+                            <span>{{ commit.create_time|date:'Y-m-d H:i' }}</span>
+                            <span><a href="/{{ commit.user.username }}">{{ commit.user.username }}</a></span>
+                            <span class="pull-right reply" username="{{ commit.user.username }}"
+                                  parent_id="{{ commit.pk }}">回复</span>
+                        </div>
+                        <div style="margin-top:10px">
+                            {% if commit.parent %}
+                                <div class="well">
+                                    <p>@{{ commit.parent.user.username }}</p>
+                                    <p>{{ commit.parent.content }}</p>
+                                </div>
+                            {% endif %}
+                            {{ commit.content }}
+                        </div>
+                    </li>
+
+                {% endfor %}
+            </ul>
+
+        </div>
+        <div>
+            <p>
+                昵称：<input type="text" id="tbCommentAuthor" class="author" disabled="disabled" size="50"
+                          value="xuqidong">
+            </p>
+            <p>评论内容：</p>
+            <p>
+                <textarea name="" id="commit_content" cols="80" rows="10"></textarea>
+            </p>
+            <button class="btn btn-danger" id="sub_btn">提交评论</button>
+        </div>
+
+    </div>
+
+
+    <script>
+        var pid;
+        $(".reply").click(function () {
+            var name = $(this).attr('username')
+            $("#commit_content").val('@' + name + '\n')
+            $("#commit_content").focus()
+            pid = $(this).attr('parent_id')
+        })
+
+        $("#sub_btn").click(function () {
+            var content = $("#commit_content").val()
+            if (pid) {
+                var index = content.indexOf('\n') + 1
+                content = content.slice(index)
+            }
+            $.ajax({
+                url: '/commit/',
+                type: 'post',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id': '{{ article.pk }}',
+                    'parent_id': pid,
+                    'content': content,
+                },
+                success: function (data) {
+                    var username = data.username
+                    var content = data.content
+                    console.log(data)
+                    $("#commit_content").val("")
+                    var insert
+                    if (pid) {
+                        var parent_name = data.parent_name
+                        var parent_content = data.parent_content
+                        insert = `
+                            <li class="list-group-item">
+                                <div>
+                                    <span>${username}</span>
+                                </div>
+                                <div style="margin-top:10px">
+                                        <div class="well">
+                                            <p>@${parent_name}</p>
+                                            <p>${parent_content}</p>
+                                        </div>
+                                    ${content}
+                                </div>
+                            </li>
+                        `
+                    } else {
+                        insert = `
+                            <li class="list-group-item">
+                                <div>
+                                    <span>${username}</span>
+                                </div>
+                                <div style="margin-top:10px">
+                                    ${content}
+                                </div>
+                            </li>
+                    `
+                    }
+
+                    $('.append').append(insert)
+                }
+            })
+        })
+
+        $(".digg").click(function () {
+            var is_up = $(this).hasClass('diggit')
+            var obj = $(this).children('span')
+            $.ajax({
+                url: '/diggit/',
+                type: 'post',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'article_id': '{{ article.pk }}',
+                    'is_up': is_up
+                },
+                success: function (data) {
+                    console.log(data);
+                    if (data.status == 100) {
+                        obj.text(Number(obj.text()) + 1)
+                    } else {
+                        $("#digg_tips").text(data.msg)
+                    }
+
+                }
+            })
+        })
+    </script>
+
+{% endblock %}

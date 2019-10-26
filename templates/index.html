@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <script src="/static/js/jquery-3.3.1.js"></script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <title>博客园</title>
+</head>
+<body>
+<div class="top">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">博客园</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">文章 <span class="sr-only">(current)</span></a></li>
+                    <li><a href="#">随笔</a></li>
+
+                </ul>
+                {% if request.user.is_authenticated %}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">{{ request.user.username }}</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false">更多操作 <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">修改密码</a></li>
+                                <li><a href="#">修改头像</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="/logout/">退出</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                {% else %}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/login/">登录</a></li>
+                        <li><a href="/register/">注册</a></li>
+
+                    </ul>
+                {% endif %}
+
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-danger">
+                <div class="panel-heading">广告招商</div>
+                <div class="panel-body">
+                    Tel:189017685666
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">京东商城</h3>
+                </div>
+                <div class="panel-body">
+                    <a href="http://www.jd.com">点击进入</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            {% for article in article_list %}
+                <div>
+                    <h4><a href="/{{ article.blog.userinfo.username }}/articles/{{ article.nid }}">{{ article.title }}</a></h4>
+                    <div class="media">
+                        <div class="media-left">
+                            <a href="#">
+                                <img class="media-object" src="/media/{{ article.blog.userinfo.avatar }}" width="60" height="60">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            {{ article.desc }}
+
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top:15px">
+                    <span><a href="/{{ article.blog.userinfo.username }}">{{ article.blog.userinfo.username }}</a></span>
+                    <span>发布于{{ article.create_time|date:'Y-m-d H:i' }}</span>
+                    <span class="glyphicon glyphicon-comment">评论({{ article.commit_num }})</span>
+                    <span class="glyphicon glyphicon-thumbs-up">点赞({{ article.up_num }})</span>
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+        <div class="col-md-2">
+            <div class="panel panel-danger">
+                <div class="panel-heading">交友</div>
+                <div class="panel-body">
+                    Tel:189017685666
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">百度</h3>
+                </div>
+                <div class="panel-body">
+                    <a href="http://www.baidu.com">点击进入</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
